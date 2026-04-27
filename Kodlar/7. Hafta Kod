@@ -1,0 +1,229 @@
+# Template class, queue, stack ve complexity örnekleri
+# Kodlar düzenlenmiş, yorumlar yenilenmiş ve daha temiz hale getirilmiştir.
+
+
+# -------------------------------------------------
+# 1) C++ Template Class Tanımı
+# -------------------------------------------------
+
+"""
+template <class T>
+class GenericClass
+{
+private:
+    T value;
+
+public:
+    GenericClass();
+    void setValue(T data);
+    T getValue() const;
+    void print() const;
+};
+"""
+
+
+# -------------------------------------------------
+# 2) Template Set Metodu
+# -------------------------------------------------
+
+"""
+template <class T>
+void GenericClass<T>::setValue(T data)
+{
+    value = data;
+}
+"""
+
+
+# -------------------------------------------------
+# 3) Dynamic Array Resize (2 kat büyütme)
+# -------------------------------------------------
+
+"""
+template <class T>
+void GenericClass<T>::resize()
+{
+    T* temp = new T[capacity * 2];
+
+    for (int i = 0; i < capacity; i++)
+    {
+        temp[i] = dataArray[i];
+    }
+
+    delete[] dataArray;
+    dataArray = temp;
+
+    capacity *= 2;
+}
+"""
+
+
+# -------------------------------------------------
+# 4) .NET Stack Kullanımı
+# -------------------------------------------------
+
+"""
+Stack<int> numbers = new Stack<int>();
+
+numbers.Push(10);
+numbers.Push(20);
+
+numbers.Pop();   // 20 çıkar
+"""
+
+
+# -------------------------------------------------
+# 5) .NET Queue Kullanımı
+# -------------------------------------------------
+
+"""
+Queue<int> queue = new Queue<int>();
+
+queue.Enqueue(10);
+queue.Enqueue(20);
+
+queue.Dequeue();   // 10 çıkar
+"""
+
+
+# -------------------------------------------------
+# 6) Queue Pointer Based Template Class
+# -------------------------------------------------
+
+"""
+template <class T>
+class Queue
+{
+private:
+
+    struct Node
+    {
+        T data;
+        Node* next;
+    };
+
+    Node* frontNode;
+    Node* rearNode;
+    int count;
+
+public:
+    Queue();
+    void enqueue(T value);
+    T dequeue();
+    T front() const;
+    bool empty() const;
+};
+"""
+
+
+# -------------------------------------------------
+# 7) Python ile Stack Mantığı
+# -------------------------------------------------
+
+class StackYapi:
+
+    def __init__(self):
+        self.data = []
+
+    def push(self, value):
+        self.data.append(value)
+
+    def pop(self):
+        if self.data:
+            return self.data.pop()
+        return None
+
+    def show(self):
+        print(self.data)
+
+
+stack = StackYapi()
+stack.push(10)
+stack.push(20)
+print("Stack pop:", stack.pop())
+
+
+# -------------------------------------------------
+# 8) Python ile Queue Mantığı
+# -------------------------------------------------
+
+class QueueYapi:
+
+    def __init__(self):
+        self.data = []
+
+    def enqueue(self, value):
+        self.data.append(value)
+
+    def dequeue(self):
+        if self.data:
+            return self.data.pop(0)
+        return None
+
+    def show(self):
+        print(self.data)
+
+
+queue = QueueYapi()
+queue.enqueue(10)
+queue.enqueue(20)
+print("Queue dequeue:", queue.dequeue())
+
+
+# -------------------------------------------------
+# 9) Dizide maksimum değer bulma
+# Time Complexity : O(n)
+# Space Complexity: O(1)
+# -------------------------------------------------
+
+def maksimum_bul(dizi):
+
+    en_buyuk = dizi[0]
+
+    for i in range(1, len(dizi)):
+        if dizi[i] > en_buyuk:
+            en_buyuk = dizi[i]
+
+    return en_buyuk
+
+
+ornek = [5, 2, 18, 7, 1]
+print("Maksimum:", maksimum_bul(ornek))
+
+
+# -------------------------------------------------
+# 10) Brute Force Maximum Subarray
+# Time Complexity : O(n^3)
+# -------------------------------------------------
+
+def max_alt_dizi(dizi):
+
+    en_iyi = dizi[0]
+    n = len(dizi)
+
+    for i in range(n):
+        for j in range(i, n):
+
+            toplam = 0
+
+            for k in range(i, j + 1):
+                toplam += dizi[k]
+
+            if toplam > en_iyi:
+                en_iyi = toplam
+
+    return en_iyi
+
+
+sayilar = [4, -1, 2, 1, -5, 4]
+print("Max Subarray:", max_alt_dizi(sayilar))
+
+
+# -------------------------------------------------
+# Bilgi Notları
+# -------------------------------------------------
+# Template -> Veri tipinden bağımsız sınıf/fonksiyon yazımı
+# Stack    -> LIFO (Last In First Out)
+# Queue    -> FIFO (First In First Out)
+# Resize   -> Kapasite dolunca belleği büyütme işlemi
+# Brute Force -> Tüm olasılıkları deneyen yaklaşım
