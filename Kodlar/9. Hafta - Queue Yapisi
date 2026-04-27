@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinamik Dequeue FIFO Görselleştirme</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}
+.container{max-width:1100px;margin:auto}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+input,button{padding:10px;border-radius:8px;border:none}
+button{cursor:pointer;background:#38bdf8;color:#00111a;font-weight:bold}
+button:hover{opacity:.9}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:8px}
+.cell{border:2px solid #334155;border-radius:10px;min-height:80px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#1e293b;transition:.35s}
+.cell.active{transform:translateY(-6px);background:#0ea5e9;color:#00111a}
+.cell.head{border-color:#22c55e}
+.cell.rear{border-color:#f97316}
+.meta{margin:15px 0;display:flex;gap:20px;flex-wrap:wrap}
+.log{background:#111827;padding:12px;border-radius:10px;min-height:120px;overflow:auto}
+small{opacity:.8}
+</style>
+</head>
+<body>
+<div class='container'>
+<h1>FIFO Dequeue (Head / Rear) Dinamik Dizi</h1>
+<p>Başlangıç boyutu 10. Eklemede baştaki boş alanlar tekrar kullanılır. Doluysa kapasite dinamik artar.</p>
+<div class='controls'>
+<input id='val' placeholder='Değer girin'>
+<button onclick='enqueue()'>Ekle</button>
+<button onclick='dequeue()'>Çıkar</button>
+<button onclick='autoDemo()'>Animasyon Demo</button>
+<button onclick='resetQueue()'>Sıfırla</button>
+</div>
+<div class='meta'>
+<div>Kapasite: <b id='cap'></b></div>
+<div>Eleman: <b id='count'></b></div>
+<div>Head: <b id='head'></b></div>
+<div>Rear: <b id='rear'></b></div>
+</div>
+<div id='grid' class='grid'></div>
+<h3>İşlem Günlüğü</h3>
+<div id='log' class='log'></div>
+</div>
+<script>
+let arr = new Array(10).fill(null);
+let head = 0, rear = 0, count = 0;
+function render(active=-1){
+ const grid=document.getElementById('grid'); grid.innerHTML='';
+ grid.style.gridTemplateColumns=`repeat(${Math.min(arr.length,10)},1fr)`;
+ arr.forEach((v,i)=>{
+  const d=document.createElement('div');
+  d.className='cell';
+  if(i===active)d.classList.add('active');
+  if(count>0 && i===head)d.classList.add('head');
+  if(count>0 && i===((rear-1+arr.length)%arr.length))d.classList.add('rear');
+  d.innerHTML=`<b>${i}</b><div>${v===null?'Boş':v}</div><small>${i===head&&count>0?'HEAD':''} ${i===((rear-1+arr.length)%arr.length)&&count>0?'REAR':''}</small>`;
+  grid.appendChild(d);
+ });
+ id('cap').textContent=arr.length; id('count').textContent=count; id('head').textContent=count?head:'-'; id('rear').textContent=count?((rear-1+arr.length)%arr.length):'-';
+}
+function id(x){return document.getElementById(x)}
+function log(t){id('log').innerHTML=`${new Date().toLocaleTimeString()} - ${t}<br>`+id('log').innerHTML}
+function resize(){
+ let n=new Array(arr.length*2).fill(null);
+ for(let i=0;i<count;i++) n[i]=arr[(head+i)%arr.length];
+ arr=n; head=0; rear=count; log('Dizi kapasitesi artırıldı: '+arr.length);
+}
+function enqueue(){
+ let value=id('val').value.trim(); if(!value)value='Veri-'+(count+1);
+ if(count===arr.length) resize();
+ arr[rear]=value; let pos=rear; rear=(rear+1)%arr.length; count++; render(pos); log(value+' eklendi -> index '+pos); id('val').value='';
+}
+function dequeue(){
+ if(count===0){log('Kuyruk boş'); return;}
+ let val=arr[head]; let pos=head; arr[head]=null; head=(head+1)%arr.length; count--; if(count===0){head=0;rear=0;} render(pos); log(val+' çıkarıldı <- index '+pos);
+}
+function resetQueue(){arr=new Array(10).fill(null);head=0;rear=0;count=0;render();log('Sistem sıfırlandı');}
+async function autoDemo(){
+ const seq=['A','B','C','D','E'];
+ for(const x of seq){id('val').value=x; enqueue(); await wait(500);} 
+ for(let i=0;i<3;i++){dequeue(); await wait(500);} 
+ ['F','G','H','I','J','K','L'].forEach((x,idx)=>setTimeout(()=>{id('val').value=x;enqueue();}, idx*500));
+}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+render();
+</script>
+</body>
+</html>
