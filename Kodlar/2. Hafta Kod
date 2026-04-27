@@ -1,0 +1,152 @@
+# Maximum Subsequence Sum problemi için 4 farklı çözüm yaklaşımı
+# Amaç: Bir dizide toplamı en büyük olan ardışık alt diziyi bulmak
+# Her algoritmanın zaman karmaşıklığı farklıdır.
+
+import random
+
+
+"""
+1. YÖNTEM
+Üçlü döngü mantığı ile tüm olası alt diziler tek tek hesaplanır.
+Zaman karmaşıklığı: O(n^3)
+"""
+
+def max_subsequence_v1(dizi):
+    en_buyuk = 0
+    uzunluk = len(dizi)
+
+    for baslangic in range(uzunluk):
+        for bitis in range(baslangic, uzunluk):
+            toplam = 0
+
+            for index in range(baslangic, bitis + 1):
+                toplam += dizi[index]
+
+            if toplam > en_buyuk:
+                en_buyuk = toplam
+
+    return en_buyuk
+
+
+ornek_dizi = [4, -3, 5, -2, -1, 2, 6, -2]
+rastgele_dizi = [1, 3, -7, 9, -7, -7, -3, 6, -7, -1]
+
+print("1. Algoritma")
+print("Örnek dizi sonucu:", max_subsequence_v1(ornek_dizi))
+print("Rastgele dizi sonucu:", max_subsequence_v1(rastgele_dizi))
+
+
+"""
+2. YÖNTEM
+Toplam değeri her seferinde sıfırdan hesaplamak yerine ilerleyerek günceller.
+Zaman karmaşıklığı: O(n^2)
+"""
+
+def max_subsequence_v2(dizi):
+    en_buyuk = 0
+    uzunluk = len(dizi)
+
+    for i in range(uzunluk):
+        toplam = 0
+
+        for j in range(i, uzunluk):
+            toplam += dizi[j]
+
+            if toplam > en_buyuk:
+                en_buyuk = toplam
+
+    return en_buyuk
+
+
+rastgele_dizi2 = [2, -5, -2, -8, -7, 10, 0, 0, 9, 5]
+
+print("\n2. Algoritma")
+print("Örnek dizi sonucu:", max_subsequence_v2(ornek_dizi))
+print("Rastgele dizi sonucu:", max_subsequence_v2(rastgele_dizi2))
+
+
+"""
+3. YÖNTEM
+Böl ve yönet yaklaşımı kullanılır.
+Dizi iki parçaya ayrılır, sol, sağ ve orta birleşim kontrol edilir.
+Zaman karmaşıklığı: O(n log n)
+"""
+
+def en_buyuk_uclu(a, b, c):
+    return max(a, b, c)
+
+
+def recursive_sum(dizi, sol, sag):
+
+    if sol == sag:
+        return dizi[sol] if dizi[sol] > 0 else 0
+
+    orta = (sol + sag) // 2
+
+    sol_sonuc = recursive_sum(dizi, sol, orta)
+    sag_sonuc = recursive_sum(dizi, orta + 1, sag)
+
+    sol_kenar = 0
+    gecici_sol = 0
+
+    for i in range(orta, sol - 1, -1):
+        gecici_sol += dizi[i]
+        if gecici_sol > sol_kenar:
+            sol_kenar = gecici_sol
+
+    sag_kenar = 0
+    gecici_sag = 0
+
+    for j in range(orta + 1, sag + 1):
+        gecici_sag += dizi[j]
+        if gecici_sag > sag_kenar:
+            sag_kenar = gecici_sag
+
+    return en_buyuk_uclu(sol_sonuc, sag_sonuc, sol_kenar + sag_kenar)
+
+
+def max_subsequence_v3(dizi):
+    return recursive_sum(dizi, 0, len(dizi) - 1)
+
+
+rastgele_dizi3 = [-5, -7, 2, 4, -2, 8, 9, -2, -9, -1]
+
+print("\n3. Algoritma")
+print("Örnek dizi sonucu:", max_subsequence_v3(ornek_dizi))
+print("Rastgele dizi sonucu:", max_subsequence_v3(rastgele_dizi3))
+
+
+"""
+4. YÖNTEM
+Tek geçişte çalışan en verimli yöntemdir.
+Negatif toplam oluşursa sıfırlanır.
+Zaman karmaşıklığı: O(n)
+"""
+
+def max_subsequence_v4(dizi):
+    en_buyuk = 0
+    anlik_toplam = 0
+
+    for eleman in dizi:
+        anlik_toplam += eleman
+
+        if anlik_toplam > en_buyuk:
+            en_buyuk = anlik_toplam
+        elif anlik_toplam < 0:
+            anlik_toplam = 0
+
+    return en_buyuk
+
+
+rastgele_dizi4 = [3, -4, 7, -1, 2, -6, 4, 5]
+
+print("\n4. Algoritma")
+print("Örnek dizi sonucu:", max_subsequence_v4(ornek_dizi))
+print("Rastgele dizi sonucu:", max_subsequence_v4(rastgele_dizi4))
+
+
+# Genel değerlendirme:
+# 1. yöntem -> O(n^3)
+# 2. yöntem -> O(n^2)
+# 3. yöntem -> O(n log n)
+# 4. yöntem -> O(n)  (en hızlı çözüm)
