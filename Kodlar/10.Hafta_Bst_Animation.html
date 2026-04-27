@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Bst_animation.html</title>
+<style>
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#08111f;color:#e5e7eb}header{background:#0f172a;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.4)}h1{margin:0 0 10px;font-size:24px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}input,button{padding:9px 12px;border-radius:8px;border:none}button{background:#2563eb;color:#fff;cursor:pointer}button:hover{background:#1d4ed8}#stats{font-weight:700;font-size:22px;margin:8px 0}#detail{font-size:14px;color:#cbd5e1;line-height:1.5}#wrap{height:calc(100vh - 165px)}svg{width:100%;height:100%}.edge{stroke:#64748b;stroke-width:2}.node circle{fill:#1e293b;stroke:#38bdf8;stroke-width:2}.node text{fill:#fff;font-size:11px;text-anchor:middle}.active circle{fill:#16a34a}.new circle{fill:#dc2626}
+</style>
+</head>
+<body>
+<header>
+<h1>Binary Search Tree Animasyonu</h1>
+<div class='row'><label>n (15-30):</label><input id='n' type='number' min='15' max='30' value='20'><button onclick='run()'>Başlat</button></div>
+<div id='stats'>Toplam NPL: 0 | Node: 0 | Ortalama: 0.00</div>
+<div id='detail'>BST Kuralı: Sol alt ağaç &lt; düğüm &lt; sağ alt ağaç. NPL burada root=1 kabul edilerek seviye derinliği olarak hesaplanır.</div>
+</header>
+<div id='wrap'><svg id='svg'></svg></div>
+<script>
+const svg=document.getElementById('svg'); const stats=document.getElementById('stats'); const detail=document.getElementById('detail');
+let root=null,list=[],busy=false;
+class Node{constructor(key,depth){this.key=key;this.npl=depth;this.left=null;this.right=null;this.x=0;this.y=0;this.id='id'+Math.random().toString(36).slice(2);}}
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+function height(node){return !node?0:1+Math.max(height(node.left),height(node.right))}
+function leafCount(node){return !node?0:(!node.left&&!node.right?1:leafCount(node.left)+leafCount(node.right))}
+function internalCount(node){return !node?0:((node.left||node.right)?1:0)+internalCount(node.left)+internalCount(node.right)}
+function inorder(node,res=[]){if(!node)return res; inorder(node.left,res); res.push(node.key); inorder(node.right,res); return res}
+function totalNPL(){return list.reduce((s,n)=>s+n.npl,0)}
+function avgNPL(){return list.length?totalNPL()/list.length:0}
+function updateText(){stats.textContent=`Toplam NPL: ${totalNPL()} | Node: ${list.length} | Ortalama: ${avgNPL().toFixed(2)}`;detail.innerHTML=`Yükseklik: ${height(root)} | Yaprak: ${leafCount(root)} | İç Düğüm: ${internalCount(root)} | Inorder: ${inorder(root,[]).join(', ')}`}
+function place(){const w=svg.clientWidth;function dfs(node,d,l,r){if(!node)return;node.x=(l+r)/2;node.y=60+d*80;dfs(node.left,d+1,l,node.x);dfs(node.right,d+1,node.x,r)}dfs(root,0,40,w-40)}
+function draw(activeId=null,newId=null){svg.innerHTML='';place();function edges(n){if(!n)return;[n.left,n.right].forEach(c=>{if(c){let line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',n.x);line.setAttribute('y1',n.y);line.setAttribute('x2',c.x);line.setAttribute('y2',c.y);line.setAttribute('class','edge');svg.appendChild(line)}});edges(n.left);edges(n.right)}function nodes(n){if(!n)return;let g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','node'+(n.id===activeId?' active':'')+(n.id===newId?' new':''));g.setAttribute('id',n.id);let c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',24);let t1=document.createElementNS('http://www.w3.org/2000/svg','text');t1.setAttribute('x',n.x);t1.setAttribute('y',n.y-5);t1.textContent=n.key;let t2=document.createElementNS('http://www.w3.org/2000/svg','text');t2.setAttribute('x',n.x);t2.setAttribute('y',n.y+11);t2.textContent='NPL:'+n.npl;g.append(c,t1,t2);svg.appendChild(g);nodes(n.left);nodes(n.right)}edges(root);nodes(root)}
+async function flash(id,newNode=false){draw(id,newNode?id:null);await wait(450);draw(null,newNode?id:null)}
+async function insert(key){if(!root){root=new Node(key,1);list.push(root);updateText();draw();await flash(root.id,true);return;}let cur=root,depth=1;while(true){await flash(cur.id);depth++;if(key<cur.key){if(!cur.left){cur.left=new Node(key,depth);list.push(cur.left);break;}cur=cur.left;}else{if(!cur.right){cur.right=new Node(key,depth);list.push(cur.right);break;}cur=cur.right;}}updateText();draw();await flash(list[list.length-1].id,true)}
+async function run(){if(busy)return;busy=true;root=null;list=[];draw();updateText();let n=parseInt(document.getElementById('n').value)||20;n=Math.max(15,Math.min(30,n));let used=[];for(let i=0;i<n;i++){let v=rnd(10,100);used.push(v);await insert(v);await wait(350);}detail.innerHTML+=' | Üretilen Sayılar: '+used.join(', ');busy=false}
+window.onresize=()=>draw();draw();
+</script>
+</body>
+</html>
