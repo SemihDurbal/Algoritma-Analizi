@@ -1,0 +1,139 @@
+# Dizi yapıları ve temel işlemler üzerine örnekler
+# Kod yapısı güncellendi, yorumlar sadeleştirildi ve okunabilir hale getirildi.
+
+import random
+import array
+import numpy as np
+
+
+# -------------------------------------------------
+# 1) Python typed array örnekleri
+# -------------------------------------------------
+
+# Integer tipinde array
+tam_sayi_dizi = array.array('i', [1, 2, 3, 4, 5])
+print("Integer array:", tam_sayi_dizi)
+print("İlk eleman tipi:", type(tam_sayi_dizi[0]))
+
+# Float tipinde array
+ondalik_dizi = array.array('f', [1.5, 2.0, 3.75])
+print("Float array:", ondalik_dizi)
+
+
+# -------------------------------------------------
+# 2) Sabit boyutlu integer array oluşturma
+# -------------------------------------------------
+
+bos_dizi = array.array('i', [0] * 5)
+bos_dizi[1] = 5
+
+print("Güncellenmiş array:", bos_dizi)
+
+
+# -------------------------------------------------
+# 3) Array tabanlı özel sınıf
+# -------------------------------------------------
+
+class SayiDizisi:
+
+    def __init__(self, boyut):
+        self.veriler = array.array('i', [0] * boyut)
+        self.kapasite = boyut
+        self.adet = 0
+
+    def ekle(self, deger):
+        if self.adet < self.kapasite:
+            self.veriler[self.adet] = deger
+            self.adet += 1
+        else:
+            print("Dizi dolu, ekleme yapılamadı.")
+
+    def sil_son(self):
+        if self.adet == 0:
+            print("Dizi boş.")
+            return None
+
+        self.adet -= 1
+        silinen = self.veriler[self.adet]
+        self.veriler[self.adet] = 0
+        return silinen
+
+    def __str__(self):
+        return str(self.veriler[:self.adet])
+
+
+# Kullanım
+nesne = SayiDizisi(5)
+
+nesne.ekle(10)
+nesne.ekle(20)
+nesne.ekle(30)
+
+print("Mevcut dizi:", nesne)
+
+cikan = nesne.sil_son()
+print("Silinen eleman:", cikan)
+print("Yeni durum:", nesne)
+
+
+# -------------------------------------------------
+# 4) Python listede tip değişimi mümkündür
+# -------------------------------------------------
+
+liste = [1, 2, 3]
+liste[-1] = "merhaba"
+
+print("Liste:", liste)
+print("Pop sonucu:", liste.pop())
+
+
+# -------------------------------------------------
+# 5) Normal Python listesinde tüm elemanları +1 artırma
+# -------------------------------------------------
+
+boyut = 20
+
+rastgele_liste = [random.randint(0, 100) for _ in range(boyut)]
+print("Orijinal liste:", rastgele_liste)
+
+artirilmis = [x + 1 for x in rastgele_liste]
+print("Yeni liste:", artirilmis)
+
+
+# -------------------------------------------------
+# 6) NumPy ile aynı işlemin hızlı hali
+# -------------------------------------------------
+
+np_dizi = np.random.randint(0, 101, size=20, dtype=np.int32)
+
+print("NumPy önce:", np_dizi)
+
+np_dizi += 1
+
+print("NumPy sonra:", np_dizi)
+
+
+# -------------------------------------------------
+# 7) C# eleman silme mantığının Python karşılığı
+# -------------------------------------------------
+
+sayilar = [10, 20, 30, 40, 50]
+silinecek_index = 2
+
+yeni_liste = []
+
+for i in range(len(sayilar)):
+    if i != silinecek_index:
+        yeni_liste.append(sayilar[i])
+
+print("Silinmiş hali:", yeni_liste)
+
+
+# -------------------------------------------------
+# Bilgi Notları
+# -------------------------------------------------
+# Python listeleri dinamik yapıdadır.
+# array.array typed yapı sunar.
+# NumPy büyük verilerde daha performanslıdır.
+# Listenin sonundan pop() işlemi genelde O(1)'dir.
+# Ortadan silme veya ekleme işlemleri çoğu zaman O(n)'dir.
