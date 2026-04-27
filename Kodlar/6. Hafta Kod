@@ -1,0 +1,261 @@
+# 6. hafta derste görülen OOP, constructor, destructor ve dynamic array örnekleri
+# Kodlar yeniden yazıldı, yorumlar sadeleştirildi.
+
+# -------------------------------------------------
+# 1) C# Complex Constructor Örneği
+# -------------------------------------------------
+
+"""
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace CompanyApp
+{
+    public class Employee
+    {
+        public string FullName { get; }
+        public string Department { get; }
+        public decimal Salary { get; }
+        public decimal Tax { get; }
+        public List<string> Skills { get; }
+        public string Email { get; }
+        public DateTime CreatedDate { get; }
+
+        public Employee(
+            string fullName,
+            string department,
+            decimal salary,
+            decimal tax,
+            List<string> skills,
+            string email = null)
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+                throw new ArgumentException("İsim boş olamaz.");
+
+            if (salary <= 0)
+                throw new ArgumentException("Maaş pozitif olmalı.");
+
+            if (tax < 0 || tax > 1)
+                throw new ArgumentException("Vergi oranı hatalı.");
+
+            if (skills == null || !skills.Any())
+                throw new ArgumentException("En az 1 yetenek girilmeli.");
+
+            FullName = fullName.Trim();
+            Department = department.Trim().ToUpper();
+            Salary = salary;
+            Tax = tax;
+
+            Skills = skills
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Trim().ToLower())
+                .Distinct()
+                .ToList();
+
+            Email = string.IsNullOrWhiteSpace(email)
+                ? CreateMail(FullName)
+                : email.Trim().ToLower();
+
+            CreatedDate = DateTime.Now;
+        }
+
+        private string CreateMail(string name)
+        {
+            return name.ToLower().Replace(" ", ".") + "@firma.com";
+        }
+
+        public decimal NetSalary()
+        {
+            return Salary - (Salary * Tax);
+        }
+    }
+}
+"""
+
+
+# -------------------------------------------------
+# 2) C++ Destructor Örneği
+# -------------------------------------------------
+
+"""
+#include <iostream>
+using namespace std;
+
+class User
+{
+public:
+    User()
+    {
+        cout << "Constructor çalıştı" << endl;
+    }
+
+    ~User()
+    {
+        cout << "Destructor çalıştı" << endl;
+    }
+};
+
+int main()
+{
+    User u;
+    cout << "Program devam ediyor" << endl;
+    return 0;
+}
+"""
+
+
+# -------------------------------------------------
+# 3) Java Object Array (Constructor ile)
+# -------------------------------------------------
+
+"""
+class Person
+{
+    String name;
+
+    Person(String name)
+    {
+        this.name = name;
+    }
+}
+
+public class Main
+{
+    public static void main(String[] args)
+    {
+        Person[] people = {
+            new Person("Ahmet"),
+            new Person("Mehmet"),
+            new Person("Ayşe")
+        };
+
+        System.out.println(people[0].name);
+    }
+}
+"""
+
+
+# -------------------------------------------------
+# 4) Java Object Array (Sonradan değer atama)
+# -------------------------------------------------
+
+"""
+class Person
+{
+    String name;
+}
+
+public class Main
+{
+    public static void main(String[] args)
+    {
+        Person[] people = new Person[3];
+
+        people[0] = new Person();
+        people[0].name = "Ahmet";
+
+        people[1] = new Person();
+        people[1].name = "Mehmet";
+
+        people[2] = new Person();
+        people[2].name = "Ayşe";
+
+        System.out.println(people[1].name);
+    }
+}
+"""
+
+
+# -------------------------------------------------
+# 5) Java Dynamic Int Array (Resize mantığı)
+# -------------------------------------------------
+
+"""
+class NumberList
+{
+    private int[] data;
+    private int count;
+
+    public NumberList()
+    {
+        data = new int[2];
+        count = 0;
+    }
+
+    public void add(int value)
+    {
+        if (count == data.length)
+        {
+            int[] temp = new int[data.length * 2];
+
+            for (int i = 0; i < data.length; i++)
+            {
+                temp[i] = data[i];
+            }
+
+            data = temp;
+        }
+
+        data[count] = value;
+        count++;
+    }
+
+    public void print()
+    {
+        for (int i = 0; i < count; i++)
+        {
+            System.out.println(data[i]);
+        }
+    }
+}
+"""
+
+
+# -------------------------------------------------
+# 6) Python ile aynı mantığın örneği
+# -------------------------------------------------
+
+class DynamicIntArray:
+
+    def __init__(self):
+        self.data = [0, 0]
+        self.count = 0
+
+    def add(self, value):
+
+        if self.count == len(self.data):
+            yeni = [0] * (len(self.data) * 2)
+
+            for i in range(len(self.data)):
+                yeni[i] = self.data[i]
+
+            self.data = yeni
+
+        self.data[self.count] = value
+        self.count += 1
+
+    def show(self):
+        for i in range(self.count):
+            print(self.data[i])
+
+
+# Test
+liste = DynamicIntArray()
+
+liste.add(10)
+liste.add(20)
+liste.add(30)
+liste.add(40)
+
+liste.show()
+
+
+# -------------------------------------------------
+# Bilgi Notları
+# -------------------------------------------------
+# Constructor -> Nesne oluşurken çalışır.
+# Destructor  -> Nesne silinirken çalışır (C++).
+# Java/C# array sabit boyutludur.
+# Python list dinamik yapıdadır.
+# Resize işlemleri genelde kapasite dolunca yapılır.
