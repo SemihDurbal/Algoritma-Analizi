@@ -1,0 +1,43 @@
+# Fibonacci sayılarının recursive ve iterative yöntemlerle karşılaştırılması
+# Aynı problemi farklı yollarla çözerek algoritma verimliliği incelenebilir.
+# Seçim yaparken zaman karmaşıklığı ve kaynak kullanımı dikkate alınmalıdır.
+
+# Recursive Fibonacci Fonksiyonu
+def fibonacci_recursive(sayi):
+    if sayi <= 1:
+        return sayi
+    return fibonacci_recursive(sayi - 1) + fibonacci_recursive(sayi - 2)
+
+
+# Recursive yöntemde çalışma süresi hızlı şekilde artar
+deger = 30
+print(fibonacci_recursive(deger))
+
+deger = 40
+print(fibonacci_recursive(deger))
+
+
+# Iterative Fibonacci Fonksiyonu
+def fibonacci_iterative(sayi):
+    if sayi <= 1:
+        return sayi
+
+    onceki_iki = 0
+    onceki_bir = 1
+
+    for i in range(2, sayi + 1):
+        yeni_deger = onceki_iki + onceki_bir
+        onceki_iki = onceki_bir
+        onceki_bir = yeni_deger
+
+    return onceki_bir
+
+
+# Döngü kullanan yöntem daha hızlı sonuç verir
+deger = 50
+print(fibonacci_iterative(deger))
+
+
+# Sonuç:
+# Recursive yöntem yaklaşık O(2^n) karmaşıklığa sahiptir.
+# Iterative yöntem O(n) karmaşıklığındadır ve daha verimlidir.
