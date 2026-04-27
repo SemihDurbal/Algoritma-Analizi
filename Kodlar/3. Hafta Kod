@@ -1,0 +1,347 @@
+# Arama ve sıralama algoritmaları üzerine farklı örnek uygulamalar
+# Kodlar yeniden düzenlenmiş, yorumlar güncellenmiş ve okunabilir hale getirilmiştir.
+
+import random
+
+
+"""
+1) Aynı anda minimum, maksimum, indexleri ve karşılaştırma sayısını bulur
+"""
+
+def min_max_raporu(adet, alt=0, ust=100):
+
+    sayilar = [random.randint(alt, ust) for _ in range(adet)]
+
+    en_kucuk = sayilar[0]
+    en_buyuk = sayilar[0]
+
+    min_index = 0
+    max_index = 0
+
+    kontrol = 0
+
+    for i in range(len(sayilar)):
+
+        kontrol += 1
+        if sayilar[i] < en_kucuk:
+            en_kucuk = sayilar[i]
+            min_index = i
+
+        kontrol += 1
+        if sayilar[i] > en_buyuk:
+            en_buyuk = sayilar[i]
+            max_index = i
+
+    return sayilar, en_kucuk, min_index, en_buyuk, max_index, kontrol
+
+
+"""
+2) Sadece minimum değer ve indexini bulur
+"""
+
+def minimum_bul(adet, alt=0, ust=100):
+
+    sayilar = [random.randint(alt, ust) for _ in range(adet)]
+
+    en_kucuk = sayilar[0]
+    min_index = 0
+    kontrol = 0
+
+    for i in range(len(sayilar)):
+        kontrol += 1
+
+        if sayilar[i] < en_kucuk:
+            en_kucuk = sayilar[i]
+            min_index = i
+
+    return sayilar, en_kucuk, min_index, kontrol
+
+
+"""
+3) Birinci ve ikinci minimum değeri bulur
+"""
+
+def ikinci_minimum(adet, alt=0, ust=100):
+
+    sayilar = [random.randint(alt, ust) for _ in range(adet)]
+
+    ilk = float("inf")
+    ikinci = float("inf")
+
+    ilk_index = -1
+    ikinci_index = -1
+
+    kontrol = 0
+
+    for i in range(len(sayilar)):
+
+        kontrol += 1
+
+        if sayilar[i] < ilk:
+            ikinci = ilk
+            ikinci_index = ilk_index
+
+            ilk = sayilar[i]
+            ilk_index = i
+
+        elif sayilar[i] < ikinci and sayilar[i] != ilk:
+            ikinci = sayilar[i]
+            ikinci_index = i
+
+    return sayilar, ilk, ilk_index, ikinci, ikinci_index, kontrol
+
+
+"""
+4) İlk 5 minimum değeri bulur
+"""
+
+def bes_minimum(adet, alt=0, ust=100):
+
+    sayilar = [random.randint(alt, ust) for _ in range(adet)]
+
+    minler = [float("inf")] * 5
+    indexler = [-1] * 5
+
+    kontrol = 0
+
+    for i in range(len(sayilar)):
+
+        kontrol += 1
+        deger = sayilar[i]
+
+        for j in range(5):
+            if deger < minler[j]:
+
+                for k in range(4, j, -1):
+                    minler[k] = minler[k - 1]
+                    indexler[k] = indexler[k - 1]
+
+                minler[j] = deger
+                indexler[j] = i
+                break
+
+    return sayilar, minler, indexler, minler[4], indexler[4], kontrol
+
+
+"""
+5) 25. minimum değeri kısmi insertion mantığı ile bulur
+"""
+
+def yirmibes_minimum(adet, alt=0, ust=1000):
+
+    dizi = [random.randint(alt, ust) for _ in range(adet)]
+
+    k = 25
+    kontrol = 0
+
+    ilk_kisim = dizi[:k]
+
+    for i in range(1, k):
+        anahtar = ilk_kisim[i]
+        j = i - 1
+
+        while j >= 0 and ilk_kisim[j] > anahtar:
+            ilk_kisim[j + 1] = ilk_kisim[j]
+            j -= 1
+
+        ilk_kisim[j + 1] = anahtar
+
+    for i in range(k, adet):
+
+        kontrol += 1
+
+        if dizi[i] < ilk_kisim[k - 1]:
+
+            anahtar = dizi[i]
+            j = k - 2
+
+            while j >= 0 and ilk_kisim[j] > anahtar:
+                ilk_kisim[j + 1] = ilk_kisim[j]
+                j -= 1
+
+            ilk_kisim[j + 1] = anahtar
+
+    return dizi, ilk_kisim, ilk_kisim[24], kontrol
+
+
+"""
+6) Bubble Sort ile 25. minimum değer
+"""
+
+def bubble_25(adet, alt=0, ust=1000):
+
+    dizi = [random.randint(alt, ust) for _ in range(adet)]
+    kontrol = 0
+
+    for i in range(adet):
+        for j in range(0, adet - i - 1):
+            kontrol += 1
+
+            if dizi[j] > dizi[j + 1]:
+                dizi[j], dizi[j + 1] = dizi[j + 1], dizi[j]
+
+    return dizi, dizi[24], kontrol
+
+
+"""
+7) Selection Sort ile 25. minimum değer
+"""
+
+def selection_25(adet, alt=0, ust=1000):
+
+    dizi = [random.randint(alt, ust) for _ in range(adet)]
+    kontrol = 0
+
+    for i in range(adet - 1):
+
+        min_index = i
+
+        for j in range(i + 1, adet):
+            kontrol += 1
+
+            if dizi[j] < dizi[min_index]:
+                min_index = j
+
+        dizi[i], dizi[min_index] = dizi[min_index], dizi[i]
+
+    return dizi, dizi[24], kontrol
+
+
+"""
+8) Bubble / Selection / Insertion karşılaştırması
+"""
+
+def sort_karsilastir(adet, alt=0, ust=100):
+
+    kaynak = [random.randint(alt, ust) for _ in range(adet)]
+
+    # Bubble
+    bubble = kaynak.copy()
+    b_k = 0
+    b_s = 0
+
+    for i in range(adet):
+        for j in range(0, adet - i - 1):
+            b_k += 1
+
+            if bubble[j] > bubble[j + 1]:
+                bubble[j], bubble[j + 1] = bubble[j + 1], bubble[j]
+                b_s += 1
+
+    # Selection
+    selection = kaynak.copy()
+    s_k = 0
+    s_s = 0
+
+    for i in range(adet - 1):
+
+        min_index = i
+
+        for j in range(i + 1, adet):
+            s_k += 1
+
+            if selection[j] < selection[min_index]:
+                min_index = j
+
+        if min_index != i:
+            selection[i], selection[min_index] = selection[min_index], selection[i]
+            s_s += 1
+
+    # Insertion
+    insertion = kaynak.copy()
+    i_k = 0
+    i_s = 0
+
+    for i in range(1, adet):
+
+        anahtar = insertion[i]
+        j = i - 1
+
+        while j >= 0 and insertion[j] > anahtar:
+            i_k += 1
+            insertion[j + 1] = insertion[j]
+            i_s += 1
+            j -= 1
+
+        if j >= 0:
+            i_k += 1
+
+        insertion[j + 1] = anahtar
+
+    return {
+        "orijinal": kaynak,
+        "bubble": (bubble, b_k, b_s),
+        "selection": (selection, s_k, s_s),
+        "insertion": (insertion, i_k, i_s)
+    }
+
+
+"""
+9) Linear Search ve Binary Search karşılaştırması
+"""
+
+def arama_karsilastir(adet, alt=0, ust=1000):
+
+    dizi = [random.randint(alt, ust) for _ in range(adet)]
+    dizi.sort()
+
+    hedef = random.randint(alt, ust)
+
+    # Linear
+    l_kontrol = 0
+    l_index = -1
+
+    for i, deger in enumerate(dizi):
+        l_kontrol += 1
+
+        if deger == hedef:
+            l_index = i
+            break
+
+    # Binary
+    b_kontrol = 0
+    b_index = -1
+
+    sol = 0
+    sag = adet - 1
+
+    while sol <= sag:
+
+        orta = (sol + sag) // 2
+        b_kontrol += 1
+
+        if dizi[orta] == hedef:
+            b_index = orta
+            break
+        elif dizi[orta] < hedef:
+            sol = orta + 1
+        else:
+            sag = orta - 1
+
+    return dizi, hedef, l_index, l_kontrol, b_index, b_kontrol
+
+
+"""
+10) Linear Search ortalama karşılaştırma hesabı
+"""
+
+def linear_ortalama(adet, tekrar=100):
+
+    toplam = 0
+
+    for _ in range(tekrar):
+
+        dizi = [random.randint(0, 1000) for _ in range(adet)]
+        hedef = random.randint(0, 1000)
+
+        sayac = 0
+
+        for eleman in dizi:
+            sayac += 1
+
+            if eleman == hedef:
+                break
+
+        toplam += sayac
+
+    return toplam / tekrar
